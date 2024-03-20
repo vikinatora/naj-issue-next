@@ -1,10 +1,87 @@
+'use client';
 import Image from "next/image";
 import styles from "./page.module.css";
+import * as nearAPI from "near-api-js";
+import { WalletSelector, setupWalletSelector } from "@near-wallet-selector/core";
+import { setupMeteorWallet } from "@near-wallet-selector/meteor-wallet";
+import { useEffect, useState } from "react";
+import "@near-wallet-selector/modal-ui/styles.css";
+import Buttons from "./Buttons";
+import { createKey, getKeys } from "@near-js/biometric-ed25519";
 
 export default function Home() {
+  const initializeNear = async () => {
+    try {
+      const key = await createKey("test")
+      console.log("KEY: ", key)
+      const derivedKey = await getKeys("test")
+      console.log("DERIVED KEY", derivedKey)
+
+    } catch (error) {
+      console.error('Error initializing NEAR:', error);
+    }
+  };
+
+  const signTransaction = async () => {
+  }
+
+  // const [walletConnection, setWalletConnection] = useState<nearAPI.WalletConnection>();
+  // const [selector, setSelector] = useState<WalletSelector>();
+  // const [isLoaded, setIsLoaded] = useState<boolean>(false);
+
+  // useEffect(() => {
+  //   (async () => {
+  //     const result = await initializeNear();
+  //     if (!result) return;
+  //     console.log("NEAR INIT RESULT: ", result)
+  //     const { walletConnection, selector } = result;
+  //     setIsLoaded(true);
+  //     setWalletConnection(walletConnection);
+  //     setSelector(selector);
+  //   })()
+  // }, [])
+
+  // const initializeNear = async () => {
+  //   try {
+  //     let keystore = new keyStores.BrowserLocalStorageKeyStore();
+  //     const near = new Near({
+  //         deps: {
+  //           keyStore: keystore
+  //         },
+  //         keyStore: keystore,
+  //         networkId: "testnet",
+  //         nodeUrl: "https://rpc.testnet.near.org",
+  //         helperUrl: "https://helper.testnet.near.org",
+  //       });
+    
+  //     const walletConnection = new WalletConnection(
+  //       near,
+  //       "Nearjs react app"
+  //     );
+    
+  //     let accountId: string = "";
+  //     if (walletConnection.getAccountId()) {
+  //       accountId = walletConnection.getAccountId()
+  //     }
+    
+  //     const selector = await setupWalletSelector({ network: "testnet", modules: [
+  //         setupMeteorWallet()
+  //       ]
+  //     })
+      
+  //     return { accountId, walletConnection, selector };
+  //   } catch (error) {
+  //     console.error('Error initializing NEAR:', error);
+  //   }
+  // };
+  
   return (
     <main className={styles.main}>
       <div className={styles.description}>
+        <div>
+          <button onClick={initializeNear}>Initialize NEAR</button>
+          <button onClick={signTransaction}>Sign Transaction</button>
+        </div>        
         <p>
           Get started by editing&nbsp;
           <code className={styles.code}>src/app/page.tsx</code>
