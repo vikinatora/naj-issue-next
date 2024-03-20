@@ -10,11 +10,8 @@
     "postinstall": "patch-package"
   },
   "dependencies": {
+    "@lapo/asn1js": "^1.2.4",
     "@near-js/biometric-ed25519": "^1.1.2",
-    "@near-wallet-selector/core": "^8.9.5",
-    "@near-wallet-selector/meteor-wallet": "^8.9.5",
-    "@near-wallet-selector/modal-ui": "^8.9.5",
-    "near-api-js": "v3.0.4",
     "next": "14.1.0",
     "patch-package": "8.0.0",
     "react": "^18",
