@@ -1,5 +1,5 @@
 diff --git a/node_modules/@near-js/biometric-ed25519/lib/index.js b/node_modules/@near-js/biometric-ed25519/lib/index.js
-index 29788a0..8879c0a 100644
+index 29788a0..9744d76 100644
 --- a/node_modules/@near-js/biometric-ed25519/lib/index.js
 +++ b/node_modules/@near-js/biometric-ed25519/lib/index.js
 @@ -17,7 +17,7 @@ const base64_1 = __importDefault(require("@hexagon/base64"));
@@ -11,7 +11,7 @@ index 29788a0..8879c0a 100644
  const crypto_1 = require("@near-js/crypto");
  const utils_1 = require("@near-js/utils");
  const utils_2 = require("./utils");
-@@ -87,18 +87,31 @@ const getKeys = (username) => __awaiter(void 0, void 0, void 0, function* () {
+@@ -87,18 +87,36 @@ const getKeys = (username) => __awaiter(void 0, void 0, void 0, function* () {
      setBufferIfUndefined();
      return navigator.credentials.get({ publicKey })
          .then((response) => __awaiter(void 0, void 0, void 0, function* () {
@@ -23,7 +23,13 @@ index 29788a0..8879c0a 100644
 -        const parser = ((_a = asn1_parser_1.default === null || asn1_parser_1.default === void 0 ? void 0 : asn1_parser_1.default.ASN1) === null || _a === void 0 ? void 0 : _a.parse) || ((_b = window === null || window === void 0 ? void 0 : window.ASN1) === null || _b === void 0 ? void 0 : _b.parse);
 -        const rAndS = parser(new Uint8Array(signature));
 +        console.log("Signature: ");
-+        console.log(signature);
++        console.log(new Uint8Array(signature));
++        let signatureStr = uint8ArrayToHex(new Uint8Array(signature));
++        console.log("Signature string: ");
++        console.log(signatureStr);
++        let signatureArr = hexStringToUint8Array(signatureStr);
++        console.log("Signature array: ");
++        console.log(signatureArr);
 +        const rAndS = asn1js_1.default.decode(new Uint8Array(signature), 0);
 +        console.log("rAndS: ");
 +        console.log(rAndS);
@@ -35,13 +41,12 @@ index 29788a0..8879c0a 100644
 +        const rStart = rObj.posContent();
 +        const rEnd = rStart + rObj.length;
 +        const r = rObj.stream.enc.slice(rStart, rEnd);
-+
 +        const sObj = rAndS.sub[1];
 +        const sStart = sObj.posContent();
 +        const sEnd = sStart + sObj.length;
 +        const s = sObj.stream.enc.slice(sStart, sEnd);
-+        console.log("r: " + r)
-+        console.log("s: " + s)
++        console.log("r: " + r);
++        console.log("s: " + s);
          const clientDataJSONHash = sha256_1.sha256.create().update(buffer_1.Buffer.from(new Uint8Array(base64_1.default.toArrayBuffer(getAssertionResponse.response.clientDataJSON, true)))).digest();
          const authenticatorDataJSONHash = buffer_1.Buffer.from(new Uint8Array(base64_1.default.toArrayBuffer(getAssertionResponse.response.authenticatorData, true)));
          const authenticatorAndClientDataJSONHash = buffer_1.Buffer.concat([buffer_1.Buffer.from(authenticatorDataJSONHash), buffer_1.Buffer.from(clientDataJSONHash)]);
@@ -50,8 +55,43 @@ index 29788a0..8879c0a 100644
          const correctPKs = yield (0, utils_2.recoverPublicKey)((0, utils_2.uint8ArrayToBigInt)(r), (0, utils_2.uint8ArrayToBigInt)(s), authenticatorAndClientDataJSONHash, 0);
          const firstEDSecret = sha256_1.sha256.create().update(buffer_1.Buffer.from(correctPKs[0])).digest();
          const firstEDPublic = ed25519_1.ed25519.getPublicKey(firstEDSecret);
-@@ -112,7 +125,7 @@ const getKeys = (username) => __awaiter(void 0, void 0, void 0, function* () {
+@@ -110,9 +128,42 @@ const getKeys = (username) => __awaiter(void 0, void 0, void 0, function* () {
+     }));
+ });
  exports.getKeys = getKeys;
++// function arrayBufferToString(buffer) {
++//     let decoder = new TextDecoder(); // Create a TextDecoder to convert our ArrayBuffer to string
++//     return decoder.decode(buffer);
++// }
++// function stringToArrayBuffer(str) {
++//     let encoder = new TextEncoder(); // Create a TextEncoder to convert our string to ArrayBuffer
++//     return encoder.encode(str).buffer;
++// }
++function uint8ArrayToHex(uint8Array) {
++    const hexParts = [];
++    for (let i = 0; i < uint8Array.length; i++) {
++        // Convert each byte to a two-digit hexadecimal number and add it to the array
++        const hex = uint8Array[i].toString(16);
++        const paddedHex = ('00' + hex).slice(-2); // Pad with leading zeros, if necessary
++        hexParts.push(paddedHex);
++    }
++    return hexParts.join('');
++}
++function hexStringToUint8Array(hexString) {
++    // Ensure the hex string has an even number of characters
++    if (hexString.length % 2 !== 0) {
++        console.error("Hex string must have an even number of characters");
++        return null;
++    }
++    // Determine the number of bytes
++    const numBytes = hexString.length / 2;
++    const byteArray = new Uint8Array(numBytes);
++    for (let i = 0, j = 0; i < numBytes; i++, j += 2) {
++        // Convert each two-character chunk to a byte
++        byteArray[i] = parseInt(hexString.slice(j, j + 2), 16);
++    }
++    return byteArray;
++}
  // To check if current browser supports WebAuthn
  const isPassKeyAvailable = () => __awaiter(void 0, void 0, void 0, function* () {
 -    var _c, _d;
